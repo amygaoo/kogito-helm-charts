@@ -2,6 +2,7 @@
 This repository contains a collection of Helm charts to deploy various Kogito applications with different 
 infrastructure requirements. 
 
+
 # Usage
 By default, each chart will deploy a specific [Kogito example](https://github.com/kiegroup/kogito-examples) 
 where the chart will deploy any required infrastructure. Each chart's usage section will assume you have the 
