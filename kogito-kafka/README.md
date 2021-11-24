@@ -1,13 +1,12 @@
-# Kogito PostgreSQL Helm Chart
-This is a Helm chart to deploy a Kogito application with PostgreSQL 
-persistence. 
+# Kogito Kafka Helm Chart
+This is a Helm chart to deploy a Kogito application with Apache Kafka integration.
 
 # Example Usage
 By default, this will deploy the Kogito [process-kafka-quickstart-quarkus](https://github.com/kiegroup/kogito-examples/tree/stable/process-kafka-quickstart-quarkus) 
 image which I have uploaded onto 
 [Quay](https://quay.io/repository/kmok/process-kafka-quickstart-quarkus?tab=tags). Follow the [initial setup](../README.md#Usage), then run these commands:
 ```sh
-helm install process-kafka-quickstart-quarkus kogito-kafka --render-subchart-notes
+helm install process-kafka-quickstart-quarkus kogito/kogito-kafka --render-subchart-notes
 kubectl run process-kafka-quickstart-quarkus-kafka-client --restart='Never' --image docker.io/bitnami/kafka:2.8.0-debian-10-r57 --command -- sleep infinity  
 kubectl exec --tty -i process-kafka-quickstart-quarkus-kafka-client -- bash
 kafka-console-producer.sh \
