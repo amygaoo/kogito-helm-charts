@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kogito-app.fullname" . }}
+  name: {{ include "kogito-app.fullname" . }}-data-index
   labels:
     {{- include "kogito-app.labels" . | nindent 4 }}
 spec:
@@ -20,19 +20,8 @@ spec:
       labels:
         {{- include "kogito-app.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "kogito-app.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-      - name: init-postgres
-        image: postgres
-        command: ['sh', '-c', 'until pg_isready --host={{ include "kogito-app.postgresqlName" . }} --port=5432 --username=postgres; do echo waiting for postgresql; sleep 2; done;']
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-data-index
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -59,14 +48,12 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: KOGITO_DATAINDEX_HTTP_URL
-              value: "http://{{ include "kogito-app.fullname" . }}-data-index:{{ .Values.dataIndexService.port }}/graphql"
-          envFrom:
-            - configMapRef:
-                name: {{ .Values.postgresqlConfigMap }}
-            - configMapRef:
-                name: kafka-kogito-connect
+          terminationMessagePolicy: File
+          # envFrom:
+          #   - configMapRef:
+          #       name: kogito-data-index-properties
+          #   - configMapRef:
+          #       name: kogito-kafka-quarkus-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kogito-app.fullname" . }}-data-index
+  labels:
+    {{- include "kogito-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.dataIndexService.type }}
+  ports: 
+    - port: {{ .Values.dataIndexService.port }}
+      targetPort: {{ .Values.dataIndexService.targetPort }}
+      nodePort: {{ .Values.dataIndexService.nodePort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "kogito-app.selectorLabels" . | nindent 4 }}

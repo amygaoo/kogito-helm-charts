@@ -11,8 +11,18 @@ image:
   # TODO: change image once done
   repository: quay.io/kmok/process-postgresql-persistence-quarkus
   pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
   tag: "jdbc"
+
+dataImage:
+  repository: quay.io/kiegroup/kogito-data-index-postgresql
+  pullPolicy: Always
+  tag: "latest" 
+
+mgmtImage:
+  repository: quay.io/kiegroup/kogito-management-console
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -40,13 +50,22 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# service:
-  # type: ClusterIP
-  # port: 80
 service:
   type: NodePort
   port: 8080
-  nodePort: 32000
+  nodePort: 32001
+  targetPort: 8080
+
+dataIndexService:
+  type: NodePort
+  port: 8080
+  nodePort: 32002
+  targetPort: 8080
+
+mgmtService:
+  type: NodePort
+  port: 8080
+  nodePort: 32003
   targetPort: 8080
 
 ingress:
@@ -90,18 +109,18 @@ tolerations: []
 
 affinity: {}
 
-# kafka:
-#   extraDeploy:
-#     - |
-#       apiVersion: v1
-#       kind: ConfigMap
-#       metadata:
-#         name: kafka-kogito-connect
-#         labels: {{- include "common.labels.standard" . | nindent 4 }}
-#           app.kubernetes.io/component: connector
-#       data:
-#         kafka.bootstrap.servers: {{ include "kafka.fullname" . }}-0.{{ include "kafka.fullname" . }}-headless.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.service.port }}
-#         ENABLE_EVENTS: "true"
+kafka:
+  extraDeploy:
+    - |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: kafka-kogito-connect
+        labels: {{- include "common.labels.standard" . | nindent 4 }}
+          app.kubernetes.io/component: connector
+      data:
+        kafka.bootstrap.servers: {{ include "kafka.fullname" . }}-0.{{ include "kafka.fullname" . }}-headless.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.service.port }}
+        ENABLE_EVENTS: "true"
 
 postgresqlConfigMap: postgresql-jdbc
 
